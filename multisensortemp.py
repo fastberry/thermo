@@ -85,16 +85,17 @@ class TempSensor:
 
     # send the data values to the temperature data service via REST
     def sendToDataService(self):
+            global idCount
+            idCount += 1
             parameters = {'id': idCount,
                     'sensorName': self.name,
                     'dateWritten': self.lastRead,
                     'temperatureValue': self.value}
             response = requests.post(webServiceURL,
                 parameters, auth=('', ''))
-            idCount += 1
 
             # for debugging the following two lines can be uncommented
-            # print 'Post Request'
+            # print 'Post Request URL: %s' % (webServiceURL)
             # print response.content
 
 #
@@ -114,7 +115,7 @@ class TemperatureService:
 
     # print instance data.  Used for debugging and diagnosis purposes
     def dump(self):
-        for sensor in sensors:
+        for sensor in self.sensors:
             sensor.dump()
         
     # initialize to access the sensors and discover them al
@@ -135,13 +136,17 @@ class TemperatureService:
                 newNiceName = 'Sensor ' + str(count)
                 count += 1
                 newSensor = TempSensor(sensorFileName, fullPath, newNiceName)
-                sensors.append(newSensor)
+                self.sensors.append(newSensor)
 
     # read the sensors
     def readSensors(self):
-        for sensor in sensors:
+        for sensor in self.sensors:
             sensor.read()
-   
+
+    # send the last data set to the data service
+    def sendToDataService(self):
+        for sensor in self.sensors:
+            sensor.sendToDataService()
 
 # create a service instance
 temperatureService = TemperatureService()
@@ -150,6 +155,7 @@ temperatureService = TemperatureService()
 while True:
     temperatureService.readSensors()
     temperatureService.dump()
+    temperatureService.sendToDataService()
     time.sleep(5)
 
 
