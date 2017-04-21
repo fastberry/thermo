@@ -16,13 +16,11 @@ import requests
 import json
 import datetime
 
-
-#
-# some global variables
-#
+# global variables
 
 # path for devices on W1 on the system bus
 devicePath = '/sys/bus/w1/devices/'
+webServiceURL = 'http://andydevubu:8080/EnvironmentDataService/rest/TemperatureRecordService/temperatureRecords'
 sensors = []
 
 # start id value.  The ID count is incremented for each data record sent to the web service
@@ -74,10 +72,10 @@ class TempSensor:
             lines = self.tempFileRead()
 
         # get the relevant portion of the file content
-        temp_output = lines[1].find('t=')
+        tempOutput = lines[1].find('t=')
 
-        if temp_output != -1:
-            temp_string = lines[1].strip()[temp_output+2:]
+        if tempOutput != -1:
+            temp_string = lines[1].strip()[tempOutput+2:]
             temp_c = float(temp_string) / 1000.0
             temp_f = temp_c * 9.0 / 5.0 + 32.0
             self.value = temp_f
@@ -86,12 +84,12 @@ class TempSensor:
             return temp_f
 
     # send the data values to the temperature data service via REST
-    def send_to_dataservice(self):
+    def sendToDataService(self):
             parameters = {'id': idCount,
                     'sensorName': self.name,
                     'dateWritten': self.lastRead,
                     'temperatureValue': self.value}
-            response = requests.post('http://andydevubu:8080/EnvironmentDataService/rest/TemperatureRecordService/temperatureRecords',
+            response = requests.post(webServiceURL,
                 parameters, auth=('', ''))
             idCount += 1
 
