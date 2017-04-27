@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 #
 # Python 2 Program to use temperature sensors DS18B20 on Raspberry to measure,
@@ -45,8 +45,7 @@ class TempSensor:
 
     # print instance data.  Used for debugging and diagnosis purposes
     def display(self):
-        print "%s: %3.2f" \
-        % (self.niceName, self.value)
+        print ("%s: %3.2f" % (self.niceName, self.value))
 
     # read temperature from file in raw format
     def tempFileRead(self):
@@ -66,7 +65,7 @@ class TempSensor:
         while 'YES' not in text[0]:
             time.sleep(0.2)
             text = self.tempFileRead()
-            print text
+            print (text)
 
         # get the relevant portion of the file content
         tempValueString = text[1].split("t=")[1]
